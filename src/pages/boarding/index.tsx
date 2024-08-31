@@ -59,8 +59,6 @@ import {
   StepLabel,
   Stepper,
 } from "@mui/material";
-import { Label } from "recharts";
-import { randomUUID } from "crypto";
 
 // ** Styled Components
 const LoginIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
@@ -140,6 +138,7 @@ const LoginPage = () => {
 
   const [_errors, setErrors] = useState<Record<string, string>>({});
 
+  const [loading, setLoading] = useState<boolean>(false);
   // ** Hooks
   const auth = useAuth();
   const theme = useTheme();
@@ -218,15 +217,41 @@ const LoginPage = () => {
         getResponseValue("informasi_bisnis_dasar", "nama_usaha")
       );
 
-      auth.login(
-        { email: "admin@materialize.com", password: "admin", rememberMe: true },
-        () => {
-          setError("email", {
-            type: "manual",
-            message: "Email or Password is invalid",
-          });
-        }
-      );
+      // hit the backend api
+      setLoading(true);
+      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/onboarding`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ business_id: uniqueId, data: responses }),
+      })
+        .then((response) => {
+          if (response.status === 200 || response.status === 201) {
+            auth.login(
+              {
+                email: "admin@materialize.com",
+                password: "admin",
+                rememberMe: true,
+              },
+              () => {
+                setError("email", {
+                  type: "manual",
+                  message: "Email or Password is invalid",
+                });
+              }
+            );
+          } else {
+            console.error("Onboard POST Response:", response.status);
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+
       // Add logic to handle form submission, e.g., send data to a backend server
     }
   };
@@ -728,8 +753,9 @@ const LoginPage = () => {
                   variant="contained"
                   onClick={handleSubmitNew}
                   sx={{ mb: 7 }}
+                  disabled={loading}
                 >
-                  Submit
+                  {loading ? "Loading..." : "Submit"}
                 </Button>
               ) : (
                 <Button variant="contained" onClick={handleNext}>

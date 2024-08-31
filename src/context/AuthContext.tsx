@@ -85,7 +85,6 @@ const AuthProvider = ({ children }: Props) => {
     params: LoginParams,
     errorCallback?: ErrCallbackType
   ) => {
-    console.log("params is", params);
     axios
       .post(authConfig.loginEndpoint, params)
       .then(async (response) => {
