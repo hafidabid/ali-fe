@@ -40,11 +40,11 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'mdi:message-outline',
       path: '/apps/chat'
     },
-    {
-      title: 'Kalender Event',
-      icon: 'mdi:calendar-blank-outline',
-      path: '/apps/calendar'
-    },
+    // {
+    //   title: 'Kalender Event',
+    //   icon: 'mdi:calendar-blank-outline',
+    //   path: '/apps/calendar'
+    // },
   ]
 }
 

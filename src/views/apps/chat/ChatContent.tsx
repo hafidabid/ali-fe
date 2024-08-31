@@ -1,5 +1,5 @@
 // ** React Imports
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 // ** MUI Imports
 import Badge from "@mui/material/Badge";
@@ -7,6 +7,7 @@ import MuiAvatar from "@mui/material/Avatar";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
 import Box, { BoxProps } from "@mui/material/Box";
 
 // ** Icon Imports
@@ -28,6 +29,8 @@ import {
   ProfileUserType,
   SendMsgParamsType,
 } from "src/types/apps/chatTypes";
+import { useGenAI } from "src/@core/components/genAI/GenAIProvider";
+import { CircularProgress } from "@mui/material";
 
 // ** Styled Components
 const ChatWrapperStartChat = styled(Box)<BoxProps>(({ theme }) => ({
@@ -57,29 +60,21 @@ const ChatContent = (props: ChatContentType) => {
     handleUserProfileRightSidebarToggle,
   } = props;
 
-  const [chats, setChats] = useState<ChatType[]>([
-    {
-      message: "halo",
-      senderId: 0,
-      time: new Date(),
-      feedback: {
-        isSent: true,
-        isSeen: true,
-        isDelivered: true,
-      },
-    },
-    {
-      message: "hai",
-      senderId: 1,
-      time: new Date(),
-      feedback: {
-        isSent: true,
-        isSeen: true,
-        isDelivered: true,
-      },
-    },
-  ]);
+  const { genAIData } = useGenAI();
+  const [chatLock, setChatLock] = useState(false);
 
+  // ** Initialize chats from localStorage or default to an empty array
+  const [chats, setChats] = useState<ChatType[]>(() => {
+    const storedChats = localStorage.getItem("chats");
+    return storedChats ? JSON.parse(storedChats) : [];
+  });
+
+  // ** Effect to update localStorage whenever chats change
+  useEffect(() => {
+    localStorage.setItem("chats", JSON.stringify(chats));
+  }, [chats]);
+
+  // ** Handle chat submission
   const handleChat = (chat: SendMsgParamsType) => {
     setChats((prevChats) => [
       ...prevChats,
@@ -94,6 +89,53 @@ const ChatContent = (props: ChatContentType) => {
         },
       },
     ]);
+
+    // ** send message to server
+    setChatLock(true);
+    fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/chatbot/${genAIData?.business_id}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ question: chat.message }),
+      }
+    )
+      .then((res) => {
+        if (res.status === 200) {
+          return res.json();
+        } else {
+          throw new Error();
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .then((data) => {
+        setChats((prevChats) => [
+          ...prevChats,
+          {
+            message: data.message,
+            senderId: 1,
+            time: new Date(),
+            feedback: {
+              isSent: true,
+              isSeen: true,
+              isDelivered: true,
+            },
+          },
+        ]);
+      })
+      .finally(() => {
+        setChatLock(false);
+      });
+  };
+
+  // ** Handle conversation reset
+  const handleResetConversation = () => {
+    setChats([]);
+    localStorage.removeItem("chats");
   };
 
   const handleStartConversation = () => {
@@ -185,6 +227,14 @@ const ChatContent = (props: ChatContentType) => {
                 </Box>
               </Box>
             </Box>
+            {/* Reset Button */}
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={handleResetConversation}
+            >
+              Reset Conversation
+            </Button>
           </Box>
 
           <ChatLog
@@ -219,7 +269,17 @@ const ChatContent = (props: ChatContentType) => {
             }}
           />
 
-          <SendMsgForm store={store} dispatch={dispatch} sendMsg={handleChat} />
+          {chatLock ? (
+            <div className="w-full  flex items-center justify-center">
+              <CircularProgress />
+            </div>
+          ) : (
+            <SendMsgForm
+              store={store}
+              dispatch={dispatch}
+              sendMsg={handleChat}
+            />
+          )}
 
           <UserProfileRight
             store={store}

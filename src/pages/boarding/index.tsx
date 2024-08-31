@@ -461,6 +461,31 @@ const LoginPage = () => {
 
                 const localOptions = selections || [];
                 switch (type) {
+                  case QuestionType.Number:
+                    return (
+                      <FormControl
+                        fullWidth
+                        sx={{ mb: 4 }}
+                        key={questionJsonIdentifier}
+                      >
+                        <TextField
+                          type="number"
+                          label={renderedQuestion}
+                          value={getResponseValue(
+                            sectionKey,
+                            questionJsonIdentifier
+                          )}
+                          onChange={(e) =>
+                            handleChange(
+                              sectionKey,
+                              questionJsonIdentifier,
+                              e.target.value
+                            )
+                          }
+                          error={!!_errors[questionJsonIdentifier]}
+                        />
+                      </FormControl>
+                    );
                   case QuestionType.Text:
                   case QuestionType.TextArea:
                     return (
