@@ -106,7 +106,9 @@ const GTMFinancialProjection = () => {
     },
     yaxis: {
       min: 0,
-      max: 90,
+      max: Object.values(genAIData?.gtm.market_size_timeline ?? { "1": 90 })
+        .map((x) => Number.parseFloat(x))
+        .reduce((a, b) => (a > b ? a : b), 0),
       show: true,
       tickAmount: 3,
       labels: {
