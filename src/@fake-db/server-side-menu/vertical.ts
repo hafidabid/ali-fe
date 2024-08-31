@@ -17,19 +17,15 @@ const navigation: VerticalNavItemsType = [
         path: '/dashboards/market-expansion'
       },
       {
-        icon: 'mdi:chart-donut',
+        icon: 'mdi:marketplace-outline',
         title: 'Go To Market Strategy',
         path: '/dashboards/gtm'
       },
+   
       {
-        icon: 'mdi:chart-donut',
-        title: 'Cari Investasi / Pendanaan',
-        path: '/dashboards/fund-investment'
-      },
-      {
-        icon: 'mdi:chart-donut',
-        title: 'Komunitas / Relasi Terkait',
-        path: '/dashboards/community-networking'
+        icon: 'mdi:people-group-outline',
+        title: 'Funding & Community',
+        path: '/dashboards/funding-community'
       },
     ]
   },

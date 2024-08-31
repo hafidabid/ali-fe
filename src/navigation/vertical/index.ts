@@ -19,15 +19,11 @@ const navigation = (): VerticalNavItemsType => {
           title: 'Go To Market Strategy',
           path: '/dashboards/gtm'
         },
-        {
-          icon: 'mdi:money-100',
-          title: 'Cari Investasi / Pendanaan',
-          path: '/dashboards/fund-investment'
-        },
+     
         {
           icon: 'mdi:people-group-outline',
-          title: 'Komunitas / Relasi Terkait',
-          path: '/dashboards/community-networking'
+          title: 'Funding & Community',
+          path: '/dashboards/funding-community'
         },
       ]
     },
