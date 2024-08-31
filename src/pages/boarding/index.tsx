@@ -1,6 +1,6 @@
 // ** React Imports
 import { useState, ReactNode, MouseEvent } from "react";
-
+import { v4 as uuidv4 } from "uuid";
 // ** Next Imports
 import Link from "next/link";
 
@@ -60,6 +60,7 @@ import {
   Stepper,
 } from "@mui/material";
 import { Label } from "recharts";
+import { randomUUID } from "crypto";
 
 // ** Styled Components
 const LoginIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
@@ -205,6 +206,27 @@ const LoginPage = () => {
   const handleSubmitNew = () => {
     if (validateStep()) {
       console.log("User responses:", responses);
+
+      // set unique id first
+      const uniqueId = `${uuidv4()}`;
+
+      // put data to local storage first
+      localStorage.setItem("responses", JSON.stringify(responses));
+      localStorage.setItem("uniqueId", uniqueId);
+      localStorage.setItem(
+        "businessName",
+        getResponseValue("informasi_bisnis_dasar", "nama_usaha")
+      );
+
+      auth.login(
+        { email: "admin@materialize.com", password: "admin", rememberMe: true },
+        () => {
+          setError("email", {
+            type: "manual",
+            message: "Email or Password is invalid",
+          });
+        }
+      );
       // Add logic to handle form submission, e.g., send data to a backend server
     }
   };

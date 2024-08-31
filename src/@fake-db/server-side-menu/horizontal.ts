@@ -9,21 +9,42 @@ const navigation: HorizontalNavItemsType = [
     icon: 'mdi:home-outline',
     title: 'Dashboards',
     children: [
-      {
-        icon: 'mdi:chart-donut',
-        title: 'CRM',
-        path: '/dashboards/crm'
-      },
+      // {
+      //   icon: 'mdi:chart-donut',
+      //   title: 'CRM',
+      //   path: '/dashboards/crm'
+      // },
+      // {
+      //   icon: 'mdi:chart-timeline-variant',
+      //   title: 'Analytics',
+      //   path: '/dashboards/analytics'
+      // },
+      // {
+      //   icon: 'mdi:cart-outline',
+      //   title: 'eCommerce',
+      //   path: '/dashboards/ecommerce'
+      // }
       {
         icon: 'mdi:chart-timeline-variant',
-        title: 'Analytics',
-        path: '/dashboards/analytics'
+        title: 'Ekspansi Pasar dan Peluang Baru',
+        path: '/dashboards/market-expansion'
       },
       {
-        icon: 'mdi:cart-outline',
-        title: 'eCommerce',
-        path: '/dashboards/ecommerce'
-      }
+        icon: 'mdi:chart-donut',
+        title: 'Go To Market Strategy',
+        path: '/dashboards/gtm'
+      },
+      {
+        icon: 'mdi:chart-donut',
+        title: 'Cari Investasi / Pendanaan',
+        path: '/dashboards/fund-investment'
+      },
+      {
+        icon: 'mdi:chart-donut',
+        title: 'Komunitas / Relasi Terkait',
+        path: '/dashboards/community-networking'
+      },
+      
     ]
   },
   {

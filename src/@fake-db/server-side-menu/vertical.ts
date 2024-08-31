@@ -12,17 +12,25 @@ const navigation: VerticalNavItemsType = [
     badgeColor: 'error',
     children: [
       {
-        title: 'CRM',
-        path: '/dashboards/crm'
+        icon: 'mdi:chart-timeline-variant',
+        title: 'Ekspansi Pasar dan Peluang Baru',
+        path: '/dashboards/market-expansion'
       },
       {
-        title: 'Analytics',
-        path: '/dashboards/analytics'
+        icon: 'mdi:chart-donut',
+        title: 'Go To Market Strategy',
+        path: '/dashboards/gtm'
       },
       {
-        title: 'eCommerce',
-        path: '/dashboards/ecommerce'
-      }
+        icon: 'mdi:chart-donut',
+        title: 'Cari Investasi / Pendanaan',
+        path: '/dashboards/fund-investment'
+      },
+      {
+        icon: 'mdi:chart-donut',
+        title: 'Komunitas / Relasi Terkait',
+        path: '/dashboards/community-networking'
+      },
     ]
   },
   {
