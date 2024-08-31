@@ -24,6 +24,10 @@ import AnalyticsTotalTransactions from "src/views/dashboards/analytics/Analytics
 import AnalyticsProjectStatistics from "src/views/dashboards/analytics/AnalyticsProjectStatistics";
 import AnalyticsTopReferralSources from "src/views/dashboards/analytics/AnalyticsTopReferralSources";
 import Overview from "src/@core/components/dashboardAddon/overview";
+import AnalysisInsight from "src/@core/components/dashboardAddon/AnalysisInsight";
+import { Card, CardHeader } from "@mui/material";
+import GTMTimeline from "src/@core/components/dashboardAddon/GTMTimeline";
+import GTMFinancialProjection from "src/@core/components/dashboardAddon/GTMFinancialProjection";
 
 const AnalyticsDashboard = () => {
   return (
@@ -32,60 +36,40 @@ const AnalyticsDashboard = () => {
         <Grid item xs={12} md={12}>
           <Overview />
         </Grid>
-
-        <Grid item xs={12} md={8}>
-          <AnalyticsTotalTransactions />
+        <Grid item xs={12}>
+          <Card>
+            <CardHeader title={"Strategy Panel"} />
+          </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <AnalyticsPerformance />
+        <Grid item xs={12} md={6}>
+          <AnalysisInsight
+            title="Diferenisasi Produk"
+            strength={`loram ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore. a day in paris. loram ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore. a day in paris.`}
+          />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <AnalyticsProjectStatistics />
+        <Grid item xs={12} md={6}>
+          <AnalysisInsight
+            title="Strategi Penetapan Harga"
+            strength={`loram ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore. a day in paris. loram ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore. a day in paris.`}
+          />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <Grid container spacing={6}>
-            <Grid item xs={6}>
-              <AnalyticsTotalRevenue />
-            </Grid>
-            <Grid item xs={6}>
-              <CardStatisticsVertical
-                stats="$13.4k"
-                color="success"
-                trendNumber="+38%"
-                title="Total Sales"
-                chipText="Last Six Month"
-                icon={<Icon icon="mdi:currency-usd" />}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <CardStatisticsVertical
-                color="info"
-                stats="142.8k"
-                trendNumber="+62%"
-                chipText="Last One Year"
-                title="Total Impressions"
-                icon={<Icon icon="mdi:link" />}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <AnalyticsOverview />
-            </Grid>
-          </Grid>
+        <Grid item xs={12} md={6}>
+          <AnalysisInsight
+            title="Saluran Distribusi"
+            strength={`loram ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore. a day in paris. loram ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore. a day in paris.`}
+          />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <AnalyticsSalesCountry />
+        <Grid item xs={12} md={6}>
+          <AnalysisInsight
+            title="Kanal Marketing"
+            strength={`loram ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore. a day in paris. loram ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore. a day in paris.`}
+          />
         </Grid>
         <Grid item xs={12} md={8}>
-          <AnalyticsTopReferralSources />
+          <GTMTimeline />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <AnalyticsWeeklySales />
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <AnalyticsVisitsByDay />
-        </Grid>
-        <Grid item xs={12} md={8}>
-          <AnalyticsActivityTimeline />
+        <Grid item xs={12} md={4}>
+          <GTMFinancialProjection />
         </Grid>
       </Grid>
     </ApexChartWrapper>
