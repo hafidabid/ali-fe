@@ -109,7 +109,7 @@ const GTMFinancialProjection = () => {
       max: Object.values(genAIData?.gtm.market_size_timeline ?? { "1": 90 })
         .map((x) => Number.parseFloat(x))
         .reduce((a, b) => (a > b ? a : b), 0),
-      show: true,
+      show: false,
       tickAmount: 3,
       labels: {
         formatter: (value) =>
