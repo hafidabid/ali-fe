@@ -17,7 +17,14 @@ interface SelectionI {
   icon?: string | ReactNode;
 }
 
+interface RangeI {
+  min: number;
+  max: number;
+  step: number;
+}
+
 interface QuestionI {
+  jsonIdentifier: string;
   question: string;
   renderedQuestion?: string;
   type: QuestionType;
@@ -25,20 +32,25 @@ interface QuestionI {
   required?: boolean;
   validationRules?: (x: any) => boolean;
   hint?: string | React.ReactNode;
+  rangeOpt?: RangeI;
 }
+
 
 interface SectionI {
   title: string;
   questions: QuestionI[];
   details?: string;
+  jsonIdentifier: string;
 }
 
 export const Questions: SectionI[] = [
   {
     title: "Informasi Bisnis Dasar",
+    jsonIdentifier: "informasi_bisnis_dasar",  // Added jsonIdentifier
     details: "Pengumpulan data terkait informasi dasar bisnis kamu",
     questions: [
       {
+        jsonIdentifier: "nama_usaha",  // Added jsonIdentifier
         question: "Nama Usaha",
         renderedQuestion: "Haii, apa nama bisnis/usahamu sekarang?",
         type: QuestionType.Text,
@@ -47,6 +59,7 @@ export const Questions: SectionI[] = [
         validationRules: (x) => x.length > 0,
       },
       {
+        jsonIdentifier: "lokasi_usaha",  // Added jsonIdentifier
         question: "Lokasi Usaha",
         renderedQuestion: "Dimana lokasi usaha kamu?",
         type: QuestionType.Location,
@@ -55,6 +68,7 @@ export const Questions: SectionI[] = [
         validationRules: (x) => true,
       },
       {
+        jsonIdentifier: "jenis_produk",  // Added jsonIdentifier
         question: "Jenis Produk",
         renderedQuestion: "Apa jenis produk yang kamu tawarkan?",
         type: QuestionType.SelectWithCustomValue,
@@ -85,6 +99,7 @@ export const Questions: SectionI[] = [
         validationRules: (x) => x.length > 0,
       },
       {
+        jsonIdentifier: "skala_usaha",  // Added jsonIdentifier
         question: "Skala Usaha",
         renderedQuestion:
           "Berapa jumlah karyawan / pekerja yang ada di usaha kamu saat ini?",
@@ -111,6 +126,7 @@ export const Questions: SectionI[] = [
         ],
       },
       {
+        jsonIdentifier: "standar_kualitas_produk",  // Added jsonIdentifier
         question: "Standar Kualitas Produk",
         renderedQuestion: "Bagaimana standar kualitas produk kamu?",
         type: QuestionType.Select,
@@ -136,9 +152,11 @@ export const Questions: SectionI[] = [
   },
   {
     title: "Informasi Pasar dan Penjualan",
+    jsonIdentifier: "informasi_pasar_dan_penjualan",  // Added jsonIdentifier
     details: "",
     questions: [
       {
+        jsonIdentifier: "target_pasar",  // Added jsonIdentifier
         question: "Target Pasar",
         renderedQuestion: "Siapakah target pasar kamu?",
         type: QuestionType.Select,
@@ -164,6 +182,7 @@ export const Questions: SectionI[] = [
         ],
       },
       {
+        jsonIdentifier: "profil_pelanggan",  // Added jsonIdentifier
         question: "Profil Pelanggan",
         renderedQuestion: "Bagaimana profil pelanggan kamu?",
         type: QuestionType.TextArea,
@@ -172,6 +191,7 @@ export const Questions: SectionI[] = [
         validationRules: (x) => x.length > 10,
       },
       {
+        jsonIdentifier: "jangkauan_pemasaran",  // Added jsonIdentifier
         question: "Jangkauan Pemasaran",
         renderedQuestion: "Jangkauan pemasaran?",
         type: QuestionType.Text,
@@ -180,6 +200,7 @@ export const Questions: SectionI[] = [
         validationRules: (x) => x.length > 10,
       },
       {
+        jsonIdentifier: "saluran_penjualan_saat_ini",  // Added jsonIdentifier
         question: "Saluran Penjualan Saat Ini",
         renderedQuestion:
           "Bagaimana anda mempromosikan penjualan anda saat ini?",
@@ -214,29 +235,41 @@ export const Questions: SectionI[] = [
         ],
       },
       {
+        jsonIdentifier: "volume_penjualan_bulanan",  // Added jsonIdentifier
         question: "Volume Penjualan Bulanan",
         renderedQuestion:
           "Berapa rata-rata omset anda per bulan (dalam rupiah)?",
         type: QuestionType.Range,
         hint: "",
         required: true,
-        validationRules: (x) => x > 50000,
+        rangeOpt: {
+          min: 1_000_000,
+          max: 5_000_000_000,
+          step: 1_000_000,
+        },
       },
     ],
   },
   {
     title: "Informasi Keuangan",
+    jsonIdentifier: "informasi_keuangan",  // Added jsonIdentifier
     details: "",
     questions: [
       {
+        jsonIdentifier: "pendapatan_tahunan",  // Added jsonIdentifier
         question: "Pendapatan Tahunan",
         renderedQuestion: "Total pendapatan dalam setahun terakhir?",
         type: QuestionType.Range,
         hint: "",
         required: true,
-        validationRules: (x) => x > 0,
+        rangeOpt: {
+          min: 10_000_000,
+          max: 60_000_000_000,
+          step: 25_000_000,
+        },
       },
       {
+        jsonIdentifier: "sumber_modal",  // Added jsonIdentifier
         question: "Sumber Modal",
         renderedQuestion: "Apa saja sumber modal usaha kamu?",
         type: QuestionType.MultiSelect,
@@ -273,9 +306,11 @@ export const Questions: SectionI[] = [
   },
   {
     title: "Informasi Keluhan atau Hambatan",
+    jsonIdentifier: "informasi_keluhan_atau_hambatan",  // Added jsonIdentifier
     details: "",
     questions: [
       {
+        jsonIdentifier: "hambatan_utama_yang_dihadapi",  // Added jsonIdentifier
         question: "Hambatan Utama yang Dihadapi",
         renderedQuestion: "Apa hambatan utama yang dihadapi usaha kamu?",
         type: QuestionType.TextArea,
@@ -286,3 +321,4 @@ export const Questions: SectionI[] = [
     ],
   },
 ];
+

@@ -50,7 +50,16 @@ import {
   QuestionType,
 } from "../../@core/components/onboarding/question";
 import Select from "@mui/material/Select";
-import { MenuItem, Step, StepLabel, Stepper } from "@mui/material";
+import {
+  Autocomplete,
+  AutocompleteRenderInputParams,
+  MenuItem,
+  Slider,
+  Step,
+  StepLabel,
+  Stepper,
+} from "@mui/material";
+import { Label } from "recharts";
 
 // ** Styled Components
 const LoginIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
@@ -120,10 +129,15 @@ interface FormData {
 }
 
 const LoginPage = () => {
-  const [responses, setResponses] = useState<Record<string, any>>({});
-  const [rememberMe, setRememberMe] = useState<boolean>(true);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [responses, setResponses] = useState<
+    Record<string, Record<string, string>>
+  >({});
   const [currentStep, setCurrentStep] = useState<number>(0);
+
+  // State to hold the slider value
+  const [sliderValue, setSliderValue] = useState<number>(1_000_000); // Default slider value
+
+  const [_errors, setErrors] = useState<Record<string, string>>({});
 
   // ** Hooks
   const auth = useAuth();
@@ -146,25 +160,39 @@ const LoginPage = () => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: FormData) => {
-    const { email, password } = data;
-    auth.login({ email, password, rememberMe }, () => {
-      console.log(email, password);
-      setError("email", {
-        type: "manual",
-        message: "Email or Password is invalid",
-      });
-    });
-  };
-
   const imageSource =
     skin === "bordered"
       ? "auth-v2-login-illustration-bordered"
       : "auth-v2-login-illustration";
 
+  const validateStep = () => {
+    const newErrors: Record<string, string> = {};
+    const questions = Questions[currentStep].questions;
+    const errF: string[] = [];
+
+    questions.forEach((question) => {
+      if (
+        question.required &&
+        !getResponseValue(sectionKey, question.jsonIdentifier)
+      ) {
+        newErrors[question.jsonIdentifier] = "This field is required.";
+        errF.push(question.renderedQuestion ?? question.question);
+      }
+    });
+
+    setErrors(newErrors);
+
+    if (errF.length > 0) {
+      alert(`Anda belum menginput: ${errF.join(", ")}`);
+    }
+    return Object.keys(newErrors).length === 0; // No errors if the object is empty
+  };
+
   const handleNext = () => {
-    if (currentStep < Questions.length - 1) {
-      setCurrentStep((prev) => prev + 1);
+    if (validateStep()) {
+      if (currentStep < Questions.length - 1) {
+        setCurrentStep((prev) => prev + 1);
+      }
     }
   };
 
@@ -175,17 +203,39 @@ const LoginPage = () => {
   };
 
   const handleSubmitNew = () => {
-    console.log("User responses:", responses);
-    // Add logic to handle form submission, e.g., send data to a backend server
+    if (validateStep()) {
+      console.log("User responses:", responses);
+      // Add logic to handle form submission, e.g., send data to a backend server
+    }
   };
 
-  const handleChange = (questionKey: string, value: any) => {
+  const handleChange = (mainKey: string, questionKey: string, value: any) => {
     setResponses({
       ...responses,
-      [questionKey]: value,
+      [mainKey]: {
+        ...responses[mainKey],
+        [questionKey]: value,
+      },
     });
+
+    // Clear error when input is valid
+    if (_errors[questionKey] && value) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [questionKey]: "",
+      }));
+    }
   };
 
+  const getResponseValue = (secKey: string, qKey: string): string => {
+    try {
+      return responses[secKey][qKey] ?? "";
+    } catch (e) {
+      return "";
+    }
+  };
+
+  const sectionKey = Questions[currentStep].jsonIdentifier;
   return (
     <Box className="content-right">
       {!hidden ? (
@@ -358,32 +408,61 @@ const LoginPage = () => {
                   question: questionKey,
                   selections,
                   renderedQuestion,
+                  rangeOpt,
+                  jsonIdentifier: questionJsonIdentifier,
                 } = question;
+
+                const localOptions = selections || [];
                 switch (type) {
                   case QuestionType.Text:
                   case QuestionType.TextArea:
                     return (
-                      <FormControl fullWidth sx={{ mb: 4 }} key={questionKey}>
+                      <FormControl
+                        fullWidth
+                        sx={{ mb: 4 }}
+                        key={questionJsonIdentifier}
+                      >
                         <TextField
                           multiline={type === QuestionType.TextArea}
                           rows={type === QuestionType.TextArea ? 4 : 1}
                           label={renderedQuestion}
-                          value={responses[questionKey] || ""}
+                          value={getResponseValue(
+                            sectionKey,
+                            questionJsonIdentifier
+                          )}
                           onChange={(e) =>
-                            handleChange(questionKey, e.target.value)
+                            handleChange(
+                              sectionKey,
+                              questionJsonIdentifier,
+                              e.target.value
+                            )
                           }
+                          error={!!_errors[questionJsonIdentifier]}
+                          helperText={_errors[questionJsonIdentifier] || ""}
                         />
                       </FormControl>
                     );
                   case QuestionType.Select:
-                  case QuestionType.SelectWithCustomValue:
                     return (
-                      <FormControl fullWidth sx={{ mb: 4 }} key={questionKey}>
+                      <FormControl
+                        fullWidth
+                        sx={{ mb: 4 }}
+                        key={questionJsonIdentifier}
+                        error={!!_errors[questionJsonIdentifier]}
+                      >
+                        <InputLabel>{renderedQuestion}</InputLabel>
                         <Select
-                          value={responses[questionKey] || ""}
-                          onChange={(e) =>
-                            handleChange(questionKey, e.target.value)
-                          }
+                          value={getResponseValue(
+                            sectionKey,
+                            questionJsonIdentifier
+                          )}
+                          onChange={(e) => {
+                            handleChange(
+                              sectionKey,
+                              questionJsonIdentifier,
+                              e.target.value
+                            );
+                          }}
                         >
                           {selections?.map((selection) => (
                             <MenuItem
@@ -396,70 +475,214 @@ const LoginPage = () => {
                         </Select>
                       </FormControl>
                     );
-                  case QuestionType.MultiSelect:
+                  case QuestionType.SelectWithCustomValue: {
+                    const handleInputChange = (
+                      event: any,
+                      newInputValue: string
+                    ) => {
+                      // If user presses Enter and the value is not in the list
+                      if (
+                        event?.type === "keydown" &&
+                        event?.key === "Enter" &&
+                        !localOptions.some(
+                          (option) => option.label === newInputValue
+                        )
+                      ) {
+                        // Add the new custom option to the options array
+                        const newOption = {
+                          label: newInputValue,
+                          value: newInputValue,
+                        };
+                        localOptions.push(newOption);
+                        handleChange(
+                          sectionKey,
+                          questionJsonIdentifier,
+                          newInputValue
+                        ); // Update responses with the new custom option
+                      } else {
+                        handleChange(
+                          sectionKey,
+                          questionJsonIdentifier,
+                          newInputValue
+                        );
+                      }
+                    };
+
                     return (
                       <FormControl
-                        component="fieldset"
-                        key={questionKey}
+                        fullWidth
                         sx={{ mb: 4 }}
+                        key={questionJsonIdentifier}
+                        error={!!_errors[questionJsonIdentifier]}
                       >
-                        {selections?.map((selection) => (
-                          <FormControlLabel
-                            key={selection.value}
-                            control={
-                              <Checkbox
-                                checked={
-                                  responses[questionKey]?.includes(
-                                    selection.value
-                                  ) || false
-                                }
-                                onChange={(e) => {
-                                  const selectedValues =
-                                    responses[questionKey] || [];
-                                  if (e.target.checked) {
-                                    handleChange(questionKey, [
-                                      ...selectedValues,
-                                      selection.value,
-                                    ]);
-                                  } else {
-                                    handleChange(
-                                      questionKey,
-                                      selectedValues.filter(
-                                        (value: string) =>
-                                          value !== selection.value
-                                      )
-                                    );
-                                  }
-                                }}
-                              />
-                            }
-                            label={selection.label}
-                          />
-                        ))}
-                      </FormControl>
-                    );
-                  case QuestionType.Range:
-                    return (
-                      <FormControl fullWidth sx={{ mb: 4 }} key={questionKey}>
-                        <TextField
-                          type="number"
-                          label={renderedQuestion}
-                          value={responses[questionKey] || ""}
-                          onChange={(e) =>
-                            handleChange(questionKey, e.target.value)
+                        <Autocomplete
+                          options={localOptions.map((option) => option.label)}
+                          getOptionLabel={(option) => option}
+                          freeSolo
+                          noOptionsText="Enter to create a new option"
+                          onInputChange={(event, newValue) =>
+                            handleInputChange(event, newValue)
                           }
+                          onChange={(event, newValue) =>
+                            handleChange(
+                              sectionKey,
+                              questionJsonIdentifier,
+                              newValue
+                            )
+                          }
+                          value={getResponseValue(
+                            sectionKey,
+                            questionJsonIdentifier
+                          )}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label={renderedQuestion}
+                              variant="outlined"
+                              onKeyDown={(e: any) => {
+                                if (
+                                  e.key === "Enter" &&
+                                  !localOptions.some(
+                                    (option) => option.label === e.target.value
+                                  )
+                                ) {
+                                  localOptions.push({
+                                    label: e.target.value,
+                                    value: e.target.value,
+                                  });
+                                  handleChange(
+                                    sectionKey,
+                                    questionJsonIdentifier,
+                                    e.target.value
+                                  ); // Update with new custom value
+                                }
+                              }}
+                            />
+                          )}
                         />
                       </FormControl>
                     );
+                  }
+                  case QuestionType.MultiSelect:
+                    return (
+                      <div>
+                        <Typography sx={{ mb: 4 }} gutterBottom>
+                          {renderedQuestion}
+                        </Typography>
+                        <FormControl
+                          component="fieldset"
+                          key={questionJsonIdentifier}
+                          sx={{ mb: 4 }}
+                          error={!!_errors[questionJsonIdentifier]}
+                        >
+                          {selections?.map((selection) => (
+                            <FormControlLabel
+                              key={selection.value}
+                              control={
+                                <Checkbox
+                                  checked={getResponseValue(
+                                    sectionKey,
+                                    questionJsonIdentifier
+                                  ).includes(selection.value)}
+                                  onChange={(e) => {
+                                    const selectedValues = getResponseValue(
+                                      sectionKey,
+                                      questionJsonIdentifier
+                                    ).split(";");
+                                    if (e.target.checked) {
+                                      handleChange(
+                                        sectionKey,
+                                        questionJsonIdentifier,
+                                        [
+                                          ...selectedValues,
+                                          selection.value,
+                                        ].join(";")
+                                      );
+                                    } else {
+                                      handleChange(
+                                        sectionKey,
+                                        questionJsonIdentifier,
+                                        selectedValues
+                                          .filter(
+                                            (value: string) =>
+                                              value !== selection.value
+                                          )
+                                          .join(";")
+                                      );
+                                    }
+                                  }}
+                                />
+                              }
+                              label={selection.label}
+                            />
+                          ))}
+                        </FormControl>
+                      </div>
+                    );
+                  case QuestionType.Range: {
+                    const handleSliderChange = (
+                      event: Event,
+                      newValue: number | number[]
+                    ) => {
+                      const value = newValue as number;
+                      setSliderValue(value);
+                      const rangeString = `${value}`;
+                      handleChange(
+                        sectionKey,
+                        questionJsonIdentifier,
+                        rangeString
+                      );
+                    };
+
+                    return (
+                      <FormControl
+                        fullWidth
+                        sx={{ mb: 4 }}
+                        key={questionJsonIdentifier}
+                        error={!!_errors[questionJsonIdentifier]}
+                      >
+                        <Typography id="slider" gutterBottom>
+                          {renderedQuestion}
+                        </Typography>
+                        <Slider
+                          value={Number.parseInt(
+                            getResponseValue(sectionKey, questionJsonIdentifier)
+                          )}
+                          onChange={handleSliderChange}
+                          valueLabelDisplay="auto"
+                          min={rangeOpt?.min || 0}
+                          max={rangeOpt?.max || 100} // Adjust the range limits as necessary
+                        />
+                        <Typography variant="body2">
+                          {`${Number.parseInt(
+                            getResponseValue(sectionKey, questionJsonIdentifier)
+                          ).toLocaleString()}`}
+                        </Typography>
+                      </FormControl>
+                    );
+                  }
                   case QuestionType.Location:
                     return (
-                      <FormControl fullWidth sx={{ mb: 4 }} key={questionKey}>
+                      <FormControl
+                        fullWidth
+                        sx={{ mb: 4 }}
+                        key={questionJsonIdentifier}
+                      >
                         <TextField
                           label={renderedQuestion}
-                          value={responses[questionKey] || ""}
+                          value={getResponseValue(
+                            sectionKey,
+                            questionJsonIdentifier
+                          )}
                           onChange={(e) =>
-                            handleChange(questionKey, e.target.value)
+                            handleChange(
+                              sectionKey,
+                              questionJsonIdentifier,
+                              e.target.value
+                            )
                           }
+                          error={!!_errors[questionJsonIdentifier]}
+                          helperText={_errors[questionJsonIdentifier]}
                         />
                       </FormControl>
                     );
