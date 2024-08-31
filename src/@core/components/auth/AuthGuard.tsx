@@ -49,7 +49,7 @@ const AuthGuard = ({ children, fallback }: AuthGuardProps) => {
         const _data = await resp.json();
         if (_data.success) {
           setLoading(false);
-        } else if (_data.failed || counter > 50) {
+        } else if (_data.failed || counter > 400) {
           setFail(true);
           setLoading(false);
         } else {
@@ -140,7 +140,7 @@ const LoadingScreen = ({ onRefresh }: { onRefresh: () => void }) => (
     <CircularProgress />
     <Typography variant="h6" sx={{ mt: 3 }}>
       Kita sedang mempersiapkan solusi terbaik untuk bisnis anda, silahkan
-      tunggu 1-3 menit.
+      tunggu beberapa saat.
     </Typography>
     <Button
       variant="contained"
@@ -171,7 +171,7 @@ const ErrorScreen = ({
     textAlign="center"
   >
     <Typography variant="h6" color="error" sx={{ mb: 2 }}>
-      Failed to verify your onboarding status.
+      Oops, something wrong in our server / your side.
     </Typography>
     <Typography variant="body1" sx={{ mb: 4 }}>
       Please choose an option to continue:
@@ -182,7 +182,7 @@ const ErrorScreen = ({
       onClick={onRetry}
       sx={{ mb: 2 }}
     >
-      Retry
+      Refresh
     </Button>
     <Button variant="outlined" color="secondary" onClick={onClearData}>
       Clear Data and Start Over
