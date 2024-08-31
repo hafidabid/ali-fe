@@ -16,23 +16,33 @@ import ReactApexcharts from "src/@core/components/react-apexcharts";
 
 // ** Util Import
 import { hexToRGBA } from "src/@core/utils/hex-to-rgba";
-
-const series = [
-  {
-    name: "Sales",
-    type: "column",
-    data: [83, 68, 56, 65, 65, 50, 39],
-  },
-  {
-    type: "line",
-    name: "Sales",
-    data: [63, 38, 31, 45, 46, 27, 18],
-  },
-];
+import { useGenAI } from "../genAI/GenAIProvider";
 
 const GTMFinancialProjection = () => {
   // ** Hook
   const theme = useTheme();
+  const { genAIData } = useGenAI();
+
+  const series = [
+    {
+      name: "Penjualan",
+      type: "column",
+      data: genAIData
+        ? Object.values(genAIData?.gtm.market_size_timeline).map((x) =>
+            Number.parseFloat(x)
+          )
+        : [],
+    },
+    {
+      type: "line",
+      name: "Penjualan",
+      data: genAIData
+        ? Object.values(genAIData?.gtm.market_size_timeline).map((x) =>
+            Number.parseFloat(x)
+          )
+        : [],
+    },
+  ];
 
   const options: ApexOptions = {
     chart: {
@@ -86,7 +96,9 @@ const GTMFinancialProjection = () => {
       },
     },
     xaxis: {
-      categories: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      categories: genAIData
+        ? Object.keys(genAIData?.gtm.market_size_timeline).map((x) => `Yr ${x}`)
+        : [],
       tickPlacement: "on",
       labels: { show: false },
       axisTicks: { show: false },
@@ -99,7 +111,7 @@ const GTMFinancialProjection = () => {
       tickAmount: 3,
       labels: {
         formatter: (value) =>
-          `${value > 999 ? `${(value / 1000).toFixed(0)}` : value}k`,
+          `${value > 999 ? `${(value / 1000).toFixed(0)}` : value}JT`,
         style: {
           fontSize: "0.75rem",
           colors: theme.palette.text.disabled,
@@ -116,7 +128,14 @@ const GTMFinancialProjection = () => {
       >
         <Box sx={{ mb: 4, display: "flex", alignItems: "center" }}>
           <Typography sx={{ mr: 4 }} variant="h5">
-            62%
+            {genAIData
+              ? Math.round(
+                  Object.values(genAIData?.gtm.market_size_timeline)
+                    .map((x) => Number.parseFloat(x))
+                    .reduce((a, b) => a + b, 0)
+                )
+              : ""}
+            JT
           </Typography>
           <Typography variant="body2">
             Potensi keuntungan yang bisa didapatkan dalam waktu 5 tahun

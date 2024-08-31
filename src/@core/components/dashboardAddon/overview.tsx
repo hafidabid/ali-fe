@@ -8,6 +8,7 @@ import Grid, { GridProps } from "@mui/material/Grid";
 import { styled, useTheme } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { Alert } from "@mui/material";
+import { useGenAI } from "../genAI/GenAIProvider";
 
 // Styled Grid component
 const StyledGrid = styled(Grid)<GridProps>(({ theme }) => ({
@@ -35,17 +36,20 @@ export default function Overview() {
   const [quickInsight, setQuickInsight] = useState("");
   const theme = useTheme();
 
+  const { genAIData } = useGenAI();
+
   useEffect(() => {
-    setBusinessName(localStorage.getItem("businessName") || "");
+    console.log("gen ai data is", genAIData);
+    if (genAIData) {
+      setBusinessName(localStorage.getItem("businessName") || "");
 
-    setBusinessSummary(
-      `lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus quos, voluptates voluptas rem. Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus quos, voluptates voluptas rem.`
-    );
+      setBusinessSummary(genAIData?.overview.summary || "");
 
-    setQuickInsight(
-      `lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus quos, voluptates voluptas rem. Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus quos, voluptates voluptas rem.`
-    );
-  }, []);
+      setQuickInsight(
+        genAIData?.overview.suggestion || "Tidak ada sugesti untuk saat ini"
+      );
+    }
+  }, [genAIData]);
 
   return (
     <Card sx={{ position: "relative" }}>

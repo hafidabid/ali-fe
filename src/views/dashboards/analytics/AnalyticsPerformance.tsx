@@ -10,21 +10,23 @@ import { ApexOptions } from "apexcharts";
 // ** Custom Components Imports
 import OptionsMenu from "src/@core/components/option-menu";
 import ReactApexcharts from "src/@core/components/react-apexcharts";
-
-const series = [
-  {
-    name: "Income",
-    data: [70, 90, 80, 95, 75, 90],
-  },
-  {
-    name: "Net Worth",
-    data: [110, 72, 62, 65, 100, 75],
-  },
-];
+import { useGenAI } from "src/@core/components/genAI/GenAIProvider";
 
 const AnalyticsPerformance = () => {
   // ** Hook
   const theme = useTheme();
+  const { genAIData } = useGenAI();
+
+  const series = [
+    {
+      name: "Income",
+      data: genAIData
+        ? Object.values(
+            genAIData.market_opportunity.strength_potential_chart
+          ).map((x) => Number.parseInt(x))
+        : [],
+    },
+  ];
 
   const options: ApexOptions = {
     chart: {
@@ -61,7 +63,11 @@ const AnalyticsPerformance = () => {
       },
     },
     colors: [theme.palette.warning.main, theme.palette.primary.main],
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels: genAIData
+      ? Object.keys(genAIData.market_opportunity.strength_potential_chart).map(
+          (r) => r.replace("_", " ")
+        )
+      : [],
     markers: { size: 0 },
     xaxis: {
       labels: {
@@ -81,6 +87,7 @@ const AnalyticsPerformance = () => {
     },
     yaxis: { show: false },
     grid: { show: false },
+    dataLabels: { enabled: true },
   };
 
   return (

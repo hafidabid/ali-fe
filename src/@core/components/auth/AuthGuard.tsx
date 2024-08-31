@@ -18,6 +18,7 @@ import { Box, Button, CircularProgress, Typography } from "@mui/material";
 
 // ** Custom Components Import
 import FallbackSpinner from "../spinner";
+import { useGenAI } from "../genAI/GenAIProvider";
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -30,6 +31,7 @@ const AuthGuard = ({ children, fallback }: AuthGuardProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [fail, setFail] = useState<boolean>(false);
   const [counter, setCounter] = useState<number>(0);
+  const { setGenAIData } = useGenAI();
 
   // Check onboarding status
   const checkStatus = useCallback(async () => {
@@ -49,6 +51,7 @@ const AuthGuard = ({ children, fallback }: AuthGuardProps) => {
         const _data = await resp.json();
         if (_data.success) {
           setLoading(false);
+          setGenAIData(_data);
         } else if (_data.failed || counter > 400) {
           setFail(true);
           setLoading(false);

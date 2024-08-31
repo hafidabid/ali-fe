@@ -13,17 +13,23 @@ import ReactApexcharts from "src/@core/components/react-apexcharts";
 
 // ** Util Import
 import { hexToRGBA } from "src/@core/utils/hex-to-rgba";
-
-const series = [
-  {
-    name: "Sales",
-    data: [17165, 13850, 12375, 9567, 7880],
-  },
-];
+import { useGenAI } from "../genAI/GenAIProvider";
 
 const GlobalMarketSize = () => {
   // ** Hook
   const theme = useTheme();
+  const { genAIData } = useGenAI();
+
+  const series = [
+    {
+      name: "market size",
+      data: genAIData
+        ? Object.values(
+            genAIData.market_opportunity.market_size_estimation_international
+          )
+        : [],
+    },
+  ];
 
   const options: ApexOptions = {
     chart: {
@@ -81,7 +87,11 @@ const GlobalMarketSize = () => {
     xaxis: {
       axisTicks: { show: false },
       axisBorder: { show: false },
-      categories: ["US", "IN", "JA", "CA", "AU"],
+      categories: genAIData
+        ? Object.keys(
+            genAIData.market_opportunity.market_size_estimation_international
+          )
+        : [],
       labels: {
         formatter: (val) => `${Number(val) / 1000}k`,
         style: {
@@ -105,8 +115,8 @@ const GlobalMarketSize = () => {
   return (
     <Card>
       <CardHeader
-        title="Sales Country"
-        subheader="Total $42,580 Sales"
+        title="Estimasi Market Size di level Internasional"
+        subheader="Dalam satuan juta rupiah"
         subheaderTypographyProps={{ sx: { lineHeight: 1.429 } }}
         titleTypographyProps={{ sx: { letterSpacing: "0.15px" } }}
       />
