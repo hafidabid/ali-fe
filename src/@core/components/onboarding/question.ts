@@ -239,7 +239,7 @@ export const Questions: SectionI[] = [
         question: "Volume Penjualan Bulanan",
         renderedQuestion:
           "Berapa rata-rata omset anda per bulan (dalam rupiah)?",
-        type: QuestionType.Range,
+        type: QuestionType.Number,
         hint: "",
         required: true,
         rangeOpt: {
@@ -259,7 +259,7 @@ export const Questions: SectionI[] = [
         jsonIdentifier: "pendapatan_tahunan",  // Added jsonIdentifier
         question: "Pendapatan Tahunan",
         renderedQuestion: "Total pendapatan dalam setahun terakhir?",
-        type: QuestionType.Range,
+        type: QuestionType.Number,
         hint: "",
         required: true,
         rangeOpt: {

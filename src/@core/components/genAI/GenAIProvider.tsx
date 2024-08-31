@@ -9,6 +9,13 @@ interface BusinessData {
   overview: Overview;
   market_opportunity: MarketOpportunity;
   gtm: GoToMarket;
+  funding_community: FundingCommunity;
+}
+
+interface FundingCommunity {
+  funding: string;
+  how_to_get_fund: string;
+  community: string;
 }
 
 interface InformasiBisnis {
